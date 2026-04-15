@@ -49,7 +49,7 @@ Proposer de configurer tout de suite via `/settings` ou `PATCH /accounts/{id}/se
 
 ## Phase 2 — Airtable
 
-1. Créer une base nommée **KonnectOS** (nom par défaut — peut être personnalisé mais garder ce nom pour cohérence).
+1. Créer une base nommée **KonectOS** (nom par défaut — peut être personnalisé mais garder ce nom pour cohérence).
 2. Créer un token avec scopes records read/write + schema bases read.
 3. Renseigner `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` dans `.env`.
 

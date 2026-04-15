@@ -3,7 +3,7 @@ description: Consulter et mettre à jour le CRM Airtable (tables Contacts et Con
 ---
 # CRM — Airtable
 
-Opérations **lecture / filtre / mise à jour** sur la base Airtable **KonnectOS**.
+Opérations **lecture / filtre / mise à jour** sur la base Airtable **KonectOS**.
 
 ## Quand activer
 
