@@ -1,0 +1,7 @@
+.env
+.env.local
+*.pem
+.DS_Store
+generated/*
+!generated/.gitkeep
+.cursor/
