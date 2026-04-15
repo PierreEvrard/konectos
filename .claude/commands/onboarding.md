@@ -1,65 +1,77 @@
 ---
-description: Wizard KonectOS — clé Konect, comptes, Airtable, persona, offre, prompts agents et tables CRM.
+description: Wizard KonectOS — Konect (connexion comptes + clé API), Airtable (token + création auto), persona, offre, prompts agents.
 ---
 # Onboarding — Setup KonectOS
 
-Configure KonectOS de zéro à « prêt à automatiser » (Konect + Airtable + mémoire + prompts).
+Configure KonectOS de zéro à « prêt à automatiser » en 5 phases guidées.
 
 ## Quand activer
 
 - Première utilisation
 - Fichiers `memory/` avec `[À CONFIGURER]`
-- L’utilisateur demande « setup », « configuration », « onboarding »
+- L'utilisateur demande « setup », « configuration », « onboarding »
 
 ## Prérequis
 
-Lire `memory/brain.md`. Reprendre une phase déjà faite si partiellement complétée.
+Lire `memory/brain.md`. Si une phase est déjà faite (ex : Konect OK mais Airtable manquant), reprendre à la phase concernée.
 
 ---
 
-## Phase 1 — Konect (connexion & IDs)
+## Phase 1 — Konect (connexion des comptes + clé API)
 
-### 1.0 Vérifier l'abonnement Konect
+### 1.0 Abonnement Konect
 
-KonectOS utilise [mykonect.ai](https://mykonect.ai) — **20 €/mois par compte social connecté** (LinkedIn, WhatsApp, Instagram = 3 comptes distincts = 60 €/mois max).
+KonectOS automatise via [mykonect.ai](https://mykonect.ai) — **20 €/mois par compte social connecté** (LinkedIn, WhatsApp, Instagram = 3 comptes = 60 €/mois max).
 
-Si l'utilisateur n'a pas encore de compte : l'inviter à s'inscrire sur [mykonect.ai](https://mykonect.ai), connecter les plateformes souhaitées, puis générer une clé API depuis le dashboard avant de continuer.
+Pas encore de compte → inviter à s'inscrire sur [mykonect.ai](https://mykonect.ai).
 
-### 1.1 Récupérer la clé API Konect
+### 1.1 Connecter les comptes sociaux sur le dashboard Konect
 
-Poser la question directement en conversation :
+**Avant de toucher à la clé API**, les comptes doivent être connectés depuis le dashboard Konect.
 
-> « Quelle est ta clé API Konect ? Elle commence par `knct_` et se trouve dans ton dashboard sur [mykonect.ai](https://mykonect.ai) → Settings → API Keys. »
+Expliquer à l'utilisateur :
 
-Une fois la clé fournie, l'écrire dans `.env` :
+> « Sur [mykonect.ai](https://mykonect.ai) → **Accounts** → clique sur "+ Add account" et connecte LinkedIn, WhatsApp et/ou Instagram selon les plateformes que tu veux automatiser. Chaque plateforme = 1 compte = 20 €/mois. »
+>
+> « Une fois tes comptes connectés, reviens ici. »
+
+Attendre la confirmation avant de continuer.
+
+### 1.2 Récupérer la clé API Konect
+
+Demander directement en conversation :
+
+> « Génère ta clé API Konect : dashboard [mykonect.ai](https://mykonect.ai) → **Settings → API Keys → Create key**. Copie-la ici (elle commence par `knct_`). »
+
+Une fois la clé fournie :
+
+1. Écrire dans `.env` :
 
 ```
 KONECT_API_KEY=knct_XXXXX
 KONECT_BASE_URL=https://mykonect.ai/api/v1
 ```
 
-Puis tester immédiatement :
+2. Tester immédiatement la connexion :
 
 ```bash
 curl -s "https://mykonect.ai/api/v1/accounts" \
   -H "Authorization: Bearer LA_CLE_FOURNIE"
 ```
 
-- Réponse `"ok": true` → clé valide, continuer.
-- Erreur `401` / `403` → clé invalide ou expirée. Demander de la régénérer sur [mykonect.ai](https://mykonect.ai) → Settings → API Keys.
+- `"ok": true` → clé valide ✓
+- `401` / `403` → clé invalide. Demander de la régénérer sur [mykonect.ai](https://mykonect.ai) → Settings → API Keys.
 
-### 1.2 Détecter et enregistrer les comptes connectés
+### 1.3 Détecter et enregistrer les comptes connectés
 
-La réponse liste les comptes. Pour chaque entrée : `id`, `platform`, `status`.
-
-Afficher un tableau récap :
+La réponse de `GET /accounts` liste les comptes. Pour chaque entrée afficher :
 
 ```
 | Plateforme | Statut       | UUID                                 |
 |------------|--------------|--------------------------------------|
 | LinkedIn   | connected    | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
 | WhatsApp   | connected    | xxxxxxxx-...                         |
-| Instagram  | disconnected | —                                    |
+| Instagram  | disconnected | — (à connecter sur mykonect.ai)      |
 ```
 
 Pour chaque compte `connected`, écrire dans `.env` :
@@ -72,44 +84,133 @@ KONECT_ACCOUNT_ID_INSTAGRAM=UUID
 
 Et noter les UUIDs dans `memory/operational/config.md` (section Account IDs).
 
-Si un compte est `disconnected` ou absent : informer que la connexion se fait depuis [mykonect.ai](https://mykonect.ai) → Accounts → Connect. Les commandes liées à cette plateforme seront désactivées jusqu'à connexion.
+Si un compte est `disconnected` : rappeler de le connecter depuis [mykonect.ai](https://mykonect.ai) → Accounts. Les commandes de cette plateforme seront inactives jusqu'à connexion.
 
-### 1.3 Fenêtre d’envoi (recommandé)
+### 1.4 Fenêtre d'envoi (recommandé)
 
-Proposer de configurer tout de suite via `/settings` ou `PATCH /accounts/{id}/settings` (timezone, `send_start_hour`, `send_end_hour`, `send_on_weekends`, `inbox_sync_enabled`).
+Proposer de configurer la fenêtre horaire via `PATCH /accounts/{id}/settings` :
+- `send_start_hour` / `send_end_hour` (ex : 8h–18h)
+- `send_on_weekends: false`
+- `timezone` (ex : `Europe/Paris`)
+- `inbox_sync_enabled: true`
 
 ---
 
-## Phase 2 — Airtable
+## Phase 2 — Airtable (token + création automatique)
 
-1. Créer une base nommée **KonectOS** (nom par défaut — peut être personnalisé mais garder ce nom pour cohérence).
-2. Créer un token avec scopes records read/write + schema bases read.
-3. Renseigner `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` dans `.env`.
+### 2.1 Créer le token Airtable avec les bons scopes
 
-### Tables à créer (2 tables — champs minimum)
+Expliquer à l'utilisateur exactement quoi faire :
 
-KonectOS n’utilise **que** deux tables Airtable : **Contacts** et **Contenus** (pas de tables Conversations ni Séquences : le suivi de fil et des séquences se fait sur **Contacts** + fichier `memory/operational/sequences.md`).
+> « Va sur [airtable.com/create/tokens](https://airtable.com/create/tokens) → **Create new token** avec ces scopes précis (sans eux Claude ne peut pas créer la base) :
+>
+> ✅ `data.records:read` — lire les contacts  
+> ✅ `data.records:write` — créer/modifier les contacts  
+> ✅ `schema.bases:read` — lire la structure des tables  
+> ✅ `schema.bases:write` — **créer les tables et les champs automatiquement**  
+>
+> Et dans "Access" : sélectionne **All current and future bases** (ou au moins la base KonectOS une fois créée).  
+> Copie le token ici (il commence par `pat`). »
 
-**Contacts** (primary `Nom`)  
-`Nom`, `Entreprise`, `Titre`, `LinkedIn URL` (url), `Instagram` (text), `WhatsApp` (phone/text), `Plateforme source` (singleSelect), `Statut` (singleSelect), `Score ICP` (singleSelect ou number), `Notes` (long), `Dernier contact` (date)
+Une fois le token fourni :
 
-Champs **optionnels** recommandés pour lier Konect sans table Conversations :  
-`chatId Konect` (text) — identifiant de conversation Konect pour la dernière interaction ; `Plateforme chat` (singleSelect : LinkedIn / WhatsApp / Instagram) ; `Dernier aperçu message` (text) ; `Unread` (number) si tu synchronises manuellement ou via script.
+1. Écrire dans `.env` :
 
-**Contenus**  
-`Titre`, `Plateforme`, `Type`, `Statut`, `Texte` (long), `Date publication` (date), `scheduledAt` (text ou date)
+```
+AIRTABLE_API_KEY=patXXXXXXXXXXXXXX
+```
 
-Après création : `GET https://api.airtable.com/v0/meta/bases/{baseId}/tables` et noter les **table IDs** (Contacts + Contenus) dans `memory/operational/config.md`.
+2. Tester la connexion :
+
+```bash
+curl -s "https://api.airtable.com/v0/meta/bases" \
+  -H "Authorization: Bearer LE_TOKEN_FOURNI"
+```
+
+- Réponse avec liste de bases (ou liste vide `[]`) → token valide ✓
+- `401` / `403` → token invalide ou scopes manquants. Vérifier les scopes listés ci-dessus.
+
+### 2.2 Créer la base KonectOS automatiquement
+
+Claude crée la base via l'API Airtable :
+
+```bash
+curl -s -X POST "https://api.airtable.com/v0/meta/bases" \
+  -H "Authorization: Bearer AIRTABLE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "KonectOS",
+    "workspaceId": "WORKSPACE_ID",
+    "tables": [
+      {
+        "name": "Contacts",
+        "fields": [
+          {"name": "Nom", "type": "singleLineText"},
+          {"name": "Entreprise", "type": "singleLineText"},
+          {"name": "Titre", "type": "singleLineText"},
+          {"name": "LinkedIn URL", "type": "url"},
+          {"name": "Instagram", "type": "singleLineText"},
+          {"name": "WhatsApp", "type": "phoneNumber"},
+          {"name": "Plateforme source", "type": "singleSelect", "options": {"choices": [{"name": "LinkedIn"}, {"name": "WhatsApp"}, {"name": "Instagram"}]}},
+          {"name": "Statut", "type": "singleSelect", "options": {"choices": [{"name": "Lead"}, {"name": "Contacté"}, {"name": "En discussion"}, {"name": "Qualifié"}, {"name": "Client"}, {"name": "Ne pas contacter"}]}},
+          {"name": "Score ICP", "type": "number", "options": {"precision": 0}},
+          {"name": "Notes", "type": "multilineText"},
+          {"name": "Dernier contact", "type": "date", "options": {"dateFormat": {"name": "iso"}}},
+          {"name": "chatId Konect", "type": "singleLineText"},
+          {"name": "Plateforme chat", "type": "singleSelect", "options": {"choices": [{"name": "LinkedIn"}, {"name": "WhatsApp"}, {"name": "Instagram"}]}},
+          {"name": "Dernier aperçu message", "type": "multilineText"},
+          {"name": "Unread", "type": "number", "options": {"precision": 0}}
+        ]
+      },
+      {
+        "name": "Contenus",
+        "fields": [
+          {"name": "Titre", "type": "singleLineText"},
+          {"name": "Plateforme", "type": "singleSelect", "options": {"choices": [{"name": "LinkedIn"}, {"name": "Instagram"}, {"name": "WhatsApp"}]}},
+          {"name": "Type", "type": "singleSelect", "options": {"choices": [{"name": "Post"}, {"name": "Carousel"}, {"name": "Message"}, {"name": "Story"}]}},
+          {"name": "Statut", "type": "singleSelect", "options": {"choices": [{"name": "Brouillon"}, {"name": "Planifié"}, {"name": "Publié"}]}},
+          {"name": "Texte", "type": "multilineText"},
+          {"name": "Date publication", "type": "date", "options": {"dateFormat": {"name": "iso"}}},
+          {"name": "scheduledAt", "type": "singleLineText"}
+        ]
+      }
+    ]
+  }'
+```
+
+**Note** : récupérer d'abord le `workspaceId` :
+
+```bash
+curl -s "https://api.airtable.com/v0/meta/workspaces" \
+  -H "Authorization: Bearer AIRTABLE_API_KEY"
+```
+
+Prendre le premier workspace (`id`).
+
+Après création, noter dans `.env` et `memory/operational/config.md` :
+
+```
+AIRTABLE_BASE_ID=appXXXXXXXXX   ← id retourné par POST /meta/bases
+TABLE_CONTACTS=tblXXXXXXXXX
+TABLE_CONTENUS=tblXXXXXXXXX
+```
+
+Les IDs des tables se récupèrent via :
+
+```bash
+curl -s "https://api.airtable.com/v0/meta/bases/BASE_ID/tables" \
+  -H "Authorization: Bearer AIRTABLE_API_KEY"
+```
 
 ---
 
 ## Phase 3 — Identité & offre
 
-Mettre à jour (questions guidées) :
+Questions guidées pour remplir :
 
-- `memory/identity/persona.md` — profil + ICP
-- `memory/identity/brand.md` — ton
-- `memory/identity/offer.md` — offre, **CTA** (`goalLink`), règles prix DM
+- `memory/identity/persona.md` — profil utilisateur + ICP (secteur, taille entreprise, problème résolu)
+- `memory/identity/brand.md` — ton, style, ce qu'on évite
+- `memory/identity/offer.md` — offre, **CTA** (`goalLink`), règles de prix à ne jamais donner en DM
 
 ---
 
@@ -117,21 +218,34 @@ Mettre à jour (questions guidées) :
 
 Renseigner `memory/operational/config.md` :
 
-- `agentName`, `companyName`, `language`
+- `agentName` (ex : "Sophie de Konect")
+- `companyName`
+- `language` (fr / en)
 
 Compléter `memory/operational/agent-prompts.md` :
 
-- Sections WhatsApp / LinkedIn / Instagram (system + premier message + relance) en adaptant les défauts au métier de l’utilisateur.
+- Sections **WhatsApp / LinkedIn / Instagram** — adapter le system prompt, le premier message type et les relances au métier de l'utilisateur.
 
 ---
 
 ## Phase 5 — Templates & brain
 
-- `memory/operational/templates.md` — 1–2 icebreakers validés
-- `memory/brain.md` — cocher setup, résumer contexte 7 jours
+- `memory/operational/templates.md` — valider 1–2 icebreakers adaptés au métier
+- `memory/brain.md` — cocher les phases complétées, résumer le contexte
 
 ---
 
 ## Fin
 
-Afficher un récapitulatif : comptes OK, base Airtable, prochaine commande suggérée (`/brain-status` puis `/prospect` ou `/linkedin-agent`).
+Afficher un récapitulatif :
+
+```
+✅ Konect : X compte(s) connecté(s) (LinkedIn / WhatsApp / Instagram)
+✅ Airtable : base "KonectOS" créée (Contacts + Contenus)
+✅ Identité configurée
+✅ Prompts agents prêts
+
+Prochaine étape suggérée :
+→ /linkedin-agent  pour gérer tes DMs LinkedIn
+→ /prospect        pour trouver des leads
+```
