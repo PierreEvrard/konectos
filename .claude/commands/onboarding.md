@@ -25,27 +25,54 @@ KonectOS utilise [mykonect.ai](https://mykonect.ai) — **20 €/mois par compte
 
 Si l'utilisateur n'a pas encore de compte : l'inviter à s'inscrire sur [mykonect.ai](https://mykonect.ai), connecter les plateformes souhaitées, puis générer une clé API depuis le dashboard avant de continuer.
 
-### 1.1 Vérifier la clé et la base URL
+### 1.1 Récupérer la clé API Konect
 
-Demander à l’utilisateur de remplir `.env` :
+Poser la question directement en conversation :
 
-- `KONECT_API_KEY`
-- `KONECT_BASE_URL` (défaut `https://mykonect.ai/api/v1` si son instance utilise ce host)
+> « Quelle est ta clé API Konect ? Elle commence par `knct_` et se trouve dans ton dashboard sur [mykonect.ai](https://mykonect.ai) → Settings → API Keys. »
 
-### 1.2 Lister les comptes
+Une fois la clé fournie, l'écrire dans `.env` :
 
-```bash
-curl -s "${KONECT_BASE_URL}/accounts" \
-  -H "Authorization: Bearer ${KONECT_API_KEY}"
+```
+KONECT_API_KEY=knct_XXXXX
+KONECT_BASE_URL=https://mykonect.ai/api/v1
 ```
 
-Pour chaque entrée : `id`, `platform`, `status`, `warmup_level` (si présent).
+Puis tester immédiatement :
 
-- **LinkedIn** → noter UUID dans `KONECT_ACCOUNT_ID_LINKEDIN` + `memory/operational/config.md`
-- **WhatsApp** → idem
-- **Instagram** → idem
+```bash
+curl -s "https://mykonect.ai/api/v1/accounts" \
+  -H "Authorization: Bearer LA_CLE_FOURNIE"
+```
 
-Si `status != connected` : guider vers le dashboard Konect + `POST /accounts/connect` ou `PATCH /accounts/{id}` selon doc.
+- Réponse `"ok": true` → clé valide, continuer.
+- Erreur `401` / `403` → clé invalide ou expirée. Demander de la régénérer sur [mykonect.ai](https://mykonect.ai) → Settings → API Keys.
+
+### 1.2 Détecter et enregistrer les comptes connectés
+
+La réponse liste les comptes. Pour chaque entrée : `id`, `platform`, `status`.
+
+Afficher un tableau récap :
+
+```
+| Plateforme | Statut       | UUID                                 |
+|------------|--------------|--------------------------------------|
+| LinkedIn   | connected    | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
+| WhatsApp   | connected    | xxxxxxxx-...                         |
+| Instagram  | disconnected | —                                    |
+```
+
+Pour chaque compte `connected`, écrire dans `.env` :
+
+```
+KONECT_ACCOUNT_ID_LINKEDIN=UUID
+KONECT_ACCOUNT_ID_WHATSAPP=UUID
+KONECT_ACCOUNT_ID_INSTAGRAM=UUID
+```
+
+Et noter les UUIDs dans `memory/operational/config.md` (section Account IDs).
+
+Si un compte est `disconnected` ou absent : informer que la connexion se fait depuis [mykonect.ai](https://mykonect.ai) → Accounts → Connect. Les commandes liées à cette plateforme seront désactivées jusqu'à connexion.
 
 ### 1.3 Fenêtre d’envoi (recommandé)
 
