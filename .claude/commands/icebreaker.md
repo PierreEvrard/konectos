@@ -1,24 +1,71 @@
 ---
-description: Générer des messages d’approche (LinkedIn ou Instagram) à partir de templates et de l’ICP — validation avant envoi Konect.
+description: Générer des messages d'approche personnalisés (LinkedIn ou Instagram) — contexte résolu, few-shots templates.md, validation avant envoi Konect.
 ---
-# Icebreaker — Messages d’approche
+# Icebreaker — Messages d'approche
 
-Produit des **premiers messages** personnalisés ; l’envoi se fait via **`POST /messages`** avec `to` (nouvelle conversation).
+Produit des **premiers messages** personnalisés ; envoi via **`POST /messages`** avec `to` (nouvelle conversation).
 
 ## Quand activer
 
-- « icebreaker », « message d’approche », « premier message »
+- « icebreaker », « message d'approche », « premier message »
 
-## Prérequis
+## Prérequis (lecture obligatoire)
 
-Lire :
+1. `memory/identity/persona.md` — ICP, ton
+2. `memory/identity/offer.md` — offre, `goalLink`, règles prix
+3. `memory/identity/brand.md` — style
+4. `memory/operational/templates.md` — few-shots par canal
+5. `memory/operational/agent-prompts.md` — section « Premier message » du canal choisi
+6. `memory/operational/config.md` — bons `accountId`
 
-- `memory/identity/persona.md`, `memory/identity/offer.md`, `memory/identity/brand.md`
-- `memory/operational/templates.md`
-- `memory/operational/agent-prompts.md` (section « premier message » du canal choisi)
-- `memory/operational/config.md` — bons `accountId`
+---
 
-## Envoi (après validation utilisateur)
+## Étape 1 — Construire le CONTEXTE RÉSOLU
+
+Avant de générer, assembler pour chaque cible :
+
+```
+[CONTEXTE_RÉSOLU — Icebreaker]
+canal : [LinkedIn / Instagram / WhatsApp]
+prospect_name : [prénom ou nom de l'entreprise]
+context_note : [raison du contact — a commenté, a liké, profil pertinent, absent au live, etc.]
+goalLink : [copie exacte depuis offer.md — si doit figurer dans le message]
+règle_lien_premier_message : [oui / non — depuis offer.md]
+ton : [copie depuis brand.md]
+```
+
+---
+
+## Étape 2 — Générer les messages
+
+Pour chaque cible, s'appuyer sur les **few-shots de `templates.md`** (canal correspondant) :
+
+- **Imiter** le rythme et la longueur des exemples — ne pas copier-coller
+- Ancrer sur `context_note` réel — aucune information inventée
+- Respecter les règles du canal :
+  - LinkedIn : pas de lien en premier message sauf `offer.md` autorise
+  - WhatsApp : 2–3 blocs, une question, URL brute si incluse
+  - Instagram : 1–2 phrases, ultra concis
+- Utiliser `{prospect_name}` **une seule fois**
+
+---
+
+## Étape 3 — Tableau de prévisualisation
+
+Avant envoi, présenter sous forme de tableau :
+
+```
+| # | Nom | Canal | Message proposé | Contexte |
+|---|-----|-------|-----------------|---------|
+| 1 | … | LI | "…" | a commenté post X |
+| 2 | … | WA | "…" | absent live |
+```
+
+**Pause validation** si > 5 envois.
+
+---
+
+## Étape 4 — Envoi
 
 **LinkedIn (nouveau fil)**
 
@@ -33,12 +80,25 @@ curl -s -X POST "${KONECT_BASE_URL}/messages" \
   }'
 ```
 
-**Instagram** : même schéma avec `KONECT_ACCOUNT_ID_INSTAGRAM` et identifiant `to` accepté par Konect pour IG.
+**Instagram** : même schéma avec `KONECT_ACCOUNT_ID_INSTAGRAM` et l'identifiant `to` IG.
 
-## Workflow
+**WhatsApp** : même schéma avec `KONECT_ACCOUNT_ID_WHATSAPP`.
 
-1. Liste de cibles + contexte (`{context_note}`).
-2. Générer 1 message par cible (ton brand + règles agent).
-3. **Pause validation** si > 5 envois.
-4. Après envoi : noter `queueId` ; MAJ Airtable **Contacts** (lier ou mettre à jour `chatId Konect` / aperçu quand tu récupères le `chat_id` via une lecture API ultérieure).
-5. Suite : `/followup` ou `/linkedin-agent`.
+---
+
+## Étape 5 — Suivi queue
+
+Après chaque envoi, noter `queueId`. En cas de doute sur l'état :
+
+```bash
+curl -s "${KONECT_BASE_URL}/queue/${QUEUE_ID}" \
+  -H "Authorization: Bearer ${KONECT_API_KEY}"
+```
+
+Si `failed` : lire `error` (fenêtre d'envoi, compte déconnecté, contenu refusé).
+
+---
+
+## Étape 6 — CRM
+
+MAJ **Contacts** Airtable : `Statut` → « Contacté », `Dernier contact`, champ optionnel `chatId Konect` quand disponible.

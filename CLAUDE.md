@@ -185,26 +185,29 @@ Respecter les options **singleSelect** existantes (valeurs exactes).
 
 ## Règles métier KonectOS
 
-1. **Semi-auto** : proposer les réponses / listes d’actions ; **validation utilisateur** avant envois massifs (> 5) ou actions sensibles  
+1. **Semi-auto** : proposer les réponses / listes d'actions ; **validation utilisateur** avant envois massifs (> 5) ou actions sensibles  
 2. **Messages** : nouvelle conversation → `to` ; réponse → `chatId` — **ne jamais inverser**  
-3. **Invitations** : champ API `profileId` (et `message` optionnel)  
-4. **Lecture conversation** : `GET /conversations/{chatId}` marque lu — ne pas poller agressivement inutilement  
-5. **Sécurité compte** : respecter fenêtre d’envoi (`/settings`) et délais Konect (`estimatedAt`)  
-6. **Dates** : ISO 8601 (`YYYY-MM-DD` ou date-time UTC)  
-7. **Pas de secrets dans le repo** : uniquement `.env` local
+3. **Invitations** : champ API obligatoire `profileId` (identifiant provider Konect ≠ URL LinkedIn). Obtenu via `GET /profiles/{id}` ou résultats `POST /linkedin/search`. Si `profileId` manquant → lancer `/enrich` d'abord.  
+4. **Lecture conversation** : `GET /conversations/{chatId}` **marque lu** — ne charger qu'après choix utilisateur sur les fils sélectionnés. Si 404 : retenter avec `?accountId=...`  
+5. **CONTEXTE_RÉSOLU obligatoire** : avant toute génération de message (agents, icebreaker, relance), assembler un bloc interne avec les valeurs exactes extraites des fichiers mémoire (`agentName`, `offerDescription`, `goalLink`, règles prix, `dernier_message_inbound`). Ne jamais improviser hors de ce contexte.  
+6. **Suivi queue** : après tout POST write (messages, posts, invitations) → noter `queueId`. Vérifier avec `GET /queue/{id}` si statut incertain. Cycle : `queued` → `processing` → `completed` / `failed`. Si `failed` : lire champ `error`.  
+7. **Annulation queue** : `DELETE /queue/{id}` uniquement si statut `queued` (409 si déjà en traitement)  
+8. **Sécurité compte** : respecter fenêtre d'envoi (`/settings`) et délais Konect (`estimatedAt`)  
+9. **Dates** : ISO 8601 (`YYYY-MM-DD` ou date-time UTC)  
+10. **Pas de secrets dans le repo** : uniquement `.env` local
 
 ---
 
-## Gestion d’erreurs (rappels)
+## Gestion d'erreurs (rappels)
 
 - **401 / 403** : vérifier `KONECT_API_KEY`  
 - **Compte non `connected`** : reconnexion dashboard Konect + `PATCH /accounts/{id}`  
-- **Queue `failed`** : relire `error`, ajuster contenu / limite / fenêtre ; retry raisonnable  
+- **Queue `failed`** : lire champ `error` — causes fréquentes : contenu refusé, fenêtre d'envoi fermée (→ `/settings`), compte déconnecté, `profileId` invalide  
 - **409 sur DELETE `/queue/{id}`** : action déjà en traitement — ne pas annuler  
+- **404 sur GET `/conversations/{chatId}`** : retenter avec `?accountId=...`  
 - **Airtable `INVALID_MULTIPLE_CHOICE_OPTIONS`** : options singleSelect à corriger
 
 ---
-
 ## Langue & ton
 
 - Répondre à l’utilisateur en **français**, tutoiement, clair et pédagogique  
