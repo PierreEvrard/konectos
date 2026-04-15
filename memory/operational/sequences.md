@@ -11,7 +11,7 @@ Documente ici les séquences actives (LI → WhatsApp → Instagram, etc.). Chaq
   1. [Plateforme] — Action — Délai
   2. …
 - **Statut** : brouillon | active | en pause
-- **Lien Airtable** : table Séquences (record IDs si besoin)
+- **Airtable** : pas de table Séquences — si tu dois lier un contact à une étape, utilise le champ **Notes** ou **Statut** sur **Contacts**, ou un tag texte libre.
 
 ---
 

@@ -23,9 +23,7 @@
 
 - **Base ID** : [À CONFIGURER]
 - **Table Contacts** : [À CONFIGURER après création meta]
-- **Table Conversations** : [À CONFIGURER]
-- **Table Contenu** : [À CONFIGURER]
-- **Table Séquences** : [À CONFIGURER]
+- **Table Contenus** : [À CONFIGURER]
 
 ## Paramètres d’envoi (optionnel — aussi gérables via `/settings`)
 

@@ -15,7 +15,7 @@ Traite les **messages LinkedIn** avec le **system prompt** configuré dans `memo
 2. `memory/operational/agent-prompts.md` — section **LinkedIn**
 3. `memory/identity/offer.md`, `memory/identity/persona.md`
 
-## Étape 1 — Conversations
+## Étape 1 — Conversations (API Konect, pas Airtable)
 
 ```bash
 curl -s "${KONECT_BASE_URL}/conversations?accountId=${KONECT_ACCOUNT_ID_LINKEDIN}&platform=linkedin&limit=50" \
@@ -59,7 +59,7 @@ Réponse typique **202** avec file d’attente — noter `queueId` / `estimatedA
 
 ## Étape 5 — CRM
 
-Mettre à jour **Conversations** / **Contacts** dans Airtable (dernier contact, statut, notes).
+Mettre à jour uniquement la table **Contacts** dans Airtable : `Dernier contact`, `Statut`, `Notes`, et si la base inclut les champs optionnels : `chatId Konect`, `Plateforme chat`, `Dernier aperçu message`, `Unread`.
 
 ## Limites
 

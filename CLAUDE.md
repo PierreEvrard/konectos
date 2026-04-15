@@ -172,12 +172,12 @@ Si le MCP est connecté dans l’IDE, l’utiliser pour doc / aide ; **pour les 
 **Variables** : `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` dans `.env`  
 **Meta tables** : `GET https://api.airtable.com/v0/meta/bases/{baseId}/tables`
 
-### Tables prévues (créées / documentées par `/onboarding`)
+### Tables Airtable (2 — créées / documentées par `/onboarding`)
 
-1. **Contacts** — Nom, URLs / handles, plateforme source, statut, score ICP, notes, dernier contact  
-2. **Conversations** — Lien contact, `chatId`, plateforme, unread, statut, action suivante  
-3. **Contenu** — Titre, plateforme, type, statut, texte, date publication, `scheduledAt`  
-4. **Séquences** — Nom, contact, étape, plateformes, statut, prochaine action
+1. **Contacts** — Nom, URLs / handles, plateforme source, statut, score ICP, notes, dernier contact ; champs optionnels pour Konect : `chatId Konect`, `Plateforme chat`, aperçu / unread si besoin (à la place d’une table Conversations dédiée).  
+2. **Contenus** — Titre, plateforme, type, statut, texte, date publication, `scheduledAt`
+
+Les **séquences** multi-touch restent décrites dans `memory/operational/sequences.md` (mémoire markdown), pas dans une table Airtable.
 
 Respecter les options **singleSelect** existantes (valeurs exactes).
 

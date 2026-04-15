@@ -1,9 +1,9 @@
 ---
-description: Calendrier éditorial multi-plateforme (LinkedIn + Instagram) — lignes Airtable Contenu + rappels scheduledAt Konect.
+description: Calendrier éditorial multi-plateforme (LinkedIn + Instagram) — lignes Airtable Contenus + rappels scheduledAt Konect.
 ---
 # Content plan — Calendrier éditorial
 
-Produit une **vue 2–4 semaines** : thèmes, formats, dates, plateformes, statuts — synchronisée avec la table **Contenu** Airtable.
+Produit une **vue 2–4 semaines** : thèmes, formats, dates, plateformes, statuts — synchronisée avec la table **Contenus** Airtable.
 
 ## Quand activer
 
@@ -12,7 +12,7 @@ Produit une **vue 2–4 semaines** : thèmes, formats, dates, plateformes, statu
 ## Prérequis
 
 - ICP + offre (`persona.md`, `offer.md`, `brand.md`)
-- Table **Contenu** créée (`/onboarding`)
+- Table **Contenus** créée (`/onboarding`)
 
 ## Workflow
 

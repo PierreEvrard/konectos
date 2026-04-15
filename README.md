@@ -47,7 +47,7 @@ Le fichier [`.mcp.json`](.mcp.json) référence le MCP documenté Konect / KodeS
 | **LinkedIn** | `/prospect`, `/enrich`, `/score`, `/invite` |
 | **CRM & messages** | `/crm`, `/icebreaker`, `/followup`, `/linkedin-agent`, `/whatsapp-agent` |
 | **Instagram** | `/instagram-prospect`, `/instagram-agent` |
-| **Contenu** | `/post`, `/carousel`, `/instagram-post`, `/content-plan`, `/engage` |
+| **Contenus** | `/post`, `/carousel`, `/instagram-post`, `/content-plan`, `/engage` |
 | **Analytics** | `/dashboard`, `/report`, `/weekly`, `/settings` |
 
 Tu peux taper `/commande` **ou** décrire ton intention : l’auto-routing est défini dans [`CLAUDE.md`](CLAUDE.md).

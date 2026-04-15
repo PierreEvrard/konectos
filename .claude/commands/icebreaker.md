@@ -40,5 +40,5 @@ curl -s -X POST "${KONECT_BASE_URL}/messages" \
 1. Liste de cibles + contexte (`{context_note}`).
 2. Générer 1 message par cible (ton brand + règles agent).
 3. **Pause validation** si > 5 envois.
-4. Après envoi : noter `queueId` ; MAJ Airtable **Contacts** + **Conversations** si `chat_id` renvoyé dans les flux suivants.
+4. Après envoi : noter `queueId` ; MAJ Airtable **Contacts** (lier ou mettre à jour `chatId Konect` / aperçu quand tu récupères le `chat_id` via une lecture API ultérieure).
 5. Suite : `/followup` ou `/linkedin-agent`.

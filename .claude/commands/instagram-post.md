@@ -37,4 +37,4 @@ curl -s -X POST "${KONECT_BASE_URL}/posts" \
 2. Proposer légende ; itérer.
 3. Valider média (URL publique accessible).
 4. `POST /posts` ; noter `queueId`.
-5. Airtable **Contenu** — plateforme Instagram.
+5. Airtable **Contenus** — plateforme Instagram.

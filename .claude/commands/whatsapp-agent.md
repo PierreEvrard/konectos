@@ -15,7 +15,7 @@ Même architecture que **LinkedIn Agent**, avec le **bloc WhatsApp** de `memory/
 2. `memory/operational/agent-prompts.md` — section **WhatsApp**
 3. `memory/identity/offer.md` (CTA, règles prix)
 
-## Conversations
+## Conversations (API Konect)
 
 ```bash
 curl -s "${KONECT_BASE_URL}/conversations?accountId=${KONECT_ACCOUNT_ID_WHATSAPP}&platform=whatsapp&limit=50" \
@@ -47,7 +47,7 @@ curl -s -X POST "${KONECT_BASE_URL}/messages" \
 1. Lister threads prioritaires (unread ou mots-clés dans preview).
 2. Pour chaque thread sélectionné : lire historique, classifier, générer **1** proposition de réponse humaine et courte.
 3. **Toujours** demander validation avant `POST`.
-4. Journaliser dans Airtable si configuré.
+4. Journaliser sur la table **Contacts** Airtable si configuré (`Dernier contact`, `Statut`, `Notes`, champs optionnels `chatId Konect`, etc.).
 
 ## Rappels style (WhatsApp)
 

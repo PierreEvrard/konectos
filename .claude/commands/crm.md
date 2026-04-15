@@ -1,5 +1,5 @@
 ---
-description: Consulter et mettre à jour le CRM Airtable (Contacts, Conversations, Contenu, Séquences).
+description: Consulter et mettre à jour le CRM Airtable (tables Contacts et Contenus uniquement).
 ---
 # CRM — Airtable
 
@@ -34,7 +34,7 @@ curl -s -X PATCH "https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${TABLE_ID}" \
 
 ## Workflow
 
-1. Comprendre la demande (liste, recherche, MAJ statut, lien conversation).
+1. Comprendre la demande (table **Contacts** ou **Contenus** : liste, recherche, MAJ statut, champs optionnels type `chatId Konect` sur un contact).
 2. Construire la requête ; paginer avec `offset`.
 3. Présenter les résultats de façon lisible.
 4. Pour écritures : confirmer les **valeurs exactes** des singleSelect.

@@ -15,7 +15,7 @@ Identique à **LinkedIn Agent** / **WhatsApp Agent** avec `platform=instagram` e
 - `memory/operational/agent-prompts.md` — section **Instagram**
 - `memory/identity/offer.md`
 
-## Conversations
+## Conversations (API Konect)
 
 ```bash
 curl -s "${KONECT_BASE_URL}/conversations?accountId=${KONECT_ACCOUNT_ID_INSTAGRAM}&platform=instagram&limit=50" \
@@ -62,4 +62,4 @@ curl -s -X POST "${KONECT_BASE_URL}/messages" \
 1. Prioriser `unread_count` ou previews pertinentes.
 2. Lire thread, classifier, générer réponse **courte** (ton IG).
 3. Validation utilisateur obligatoire avant envoi.
-4. MAJ Airtable.
+4. MAJ Airtable **Contacts** uniquement (comme pour LinkedIn / WhatsApp).

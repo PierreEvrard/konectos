@@ -50,4 +50,4 @@ Si supporté par ton instance Konect : champ `mediaUrl` (URL publique du média)
 1. Brief : angle, CTA, longueur.
 2. Proposer 1–2 versions ; itérer.
 3. Après validation : `POST /posts` ; noter `queueId`.
-4. Créer / mettre à jour ligne **Contenu** dans Airtable (statut Planifié / Publié selon cas).
+4. Créer / mettre à jour une ligne dans la table **Contenus** Airtable (statut Planifié / Publié selon cas).

@@ -53,21 +53,20 @@ Proposer de configurer tout de suite via `/settings` ou `PATCH /accounts/{id}/se
 2. Créer un token avec scopes records read/write + schema bases read.
 3. Renseigner `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` dans `.env`.
 
-### Tables à créer (champs minimum)
+### Tables à créer (2 tables — champs minimum)
+
+KonectOS n’utilise **que** deux tables Airtable : **Contacts** et **Contenus** (pas de tables Conversations ni Séquences : le suivi de fil et des séquences se fait sur **Contacts** + fichier `memory/operational/sequences.md`).
 
 **Contacts** (primary `Nom`)  
 `Nom`, `Entreprise`, `Titre`, `LinkedIn URL` (url), `Instagram` (text), `WhatsApp` (phone/text), `Plateforme source` (singleSelect), `Statut` (singleSelect), `Score ICP` (singleSelect ou number), `Notes` (long), `Dernier contact` (date)
 
-**Conversations**  
-`chatId` (text), `Plateforme` (singleSelect), `Contact` (link Contacts), `Unread` (number), `Dernier aperçu` (text), `Statut` (singleSelect), `Action suivante` (text), `Dernier message` (date)
+Champs **optionnels** recommandés pour lier Konect sans table Conversations :  
+`chatId Konect` (text) — identifiant de conversation Konect pour la dernière interaction ; `Plateforme chat` (singleSelect : LinkedIn / WhatsApp / Instagram) ; `Dernier aperçu message` (text) ; `Unread` (number) si tu synchronises manuellement ou via script.
 
-**Contenu**  
+**Contenus**  
 `Titre`, `Plateforme`, `Type`, `Statut`, `Texte` (long), `Date publication` (date), `scheduledAt` (text ou date)
 
-**Séquences**  
-`Nom`, `Contact` (link), `Étape`, `Plateformes` (text), `Statut`, `Prochaine action` (text), `Date prochaine` (date)
-
-Après création : `GET https://api.airtable.com/v0/meta/bases/{baseId}/tables` et noter les **table IDs** dans `memory/operational/config.md`.
+Après création : `GET https://api.airtable.com/v0/meta/bases/{baseId}/tables` et noter les **table IDs** (Contacts + Contenus) dans `memory/operational/config.md`.
 
 ---
 

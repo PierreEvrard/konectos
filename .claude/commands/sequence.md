@@ -3,7 +3,7 @@ description: Concevoir des séquences multi-touch cross-plateforme (LinkedIn →
 ---
 # Séquences multi-touch
 
-Conçoit des enchaînements **LI → WA → IG** (ou sous-ensembles) et les enregistre dans **`memory/operational/sequences.md`** + recommandations d’enregistrement Airtable (table **Séquences**).
+Conçoit des enchaînements **LI → WA → IG** (ou sous-ensembles) et les enregistre dans **`memory/operational/sequences.md`** uniquement (pas de table Airtable Séquences — utiliser **Contacts** pour statut / notes d’étape si besoin).
 
 ## Quand activer
 
@@ -21,7 +21,7 @@ Conçoit des enchaînements **LI → WA → IG** (ou sous-ensembles) et les enre
    - invitation / message `to` / réponse `chatId` / post / commentaire / réaction
 3. Règles **semi-auto** : points de validation utilisateur avant envois massifs.
 4. Écrire la séquence dans `memory/operational/sequences.md` (format du fichier).
-5. Si Airtable prêt : schéma des champs à remplir pour chaque contact en séquence.
+5. Si besoin de suivi CRM : mettre à jour **Contacts** (Statut, Notes, `chatId Konect`, etc.) — pas de table Séquences.
 
 ## Rappels API
 

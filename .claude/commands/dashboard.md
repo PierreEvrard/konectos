@@ -41,7 +41,7 @@ curl -s -X DELETE "${KONECT_BASE_URL}/queue/${QUEUE_ITEM_ID}" \
 
 (`204` attendu ; `409` si déjà en cours.)
 
-## Conversations
+## Conversations Konect (API, pas table Airtable)
 
 Aperçu rapide par plateforme (unread) :
 

@@ -30,4 +30,4 @@ Konect **`POST /posts`** accepte du **texte** (+ `mediaUrl` optionnel). Un carro
 1. Collecter l’objectif pédagogique et 3–5 points clés.
 2. Générer le script slide par slide + légende.
 3. Valider avec l’utilisateur.
-4. Option : enregistrer dans Airtable **Contenu** (Type = Carousel, Statut = Brouillon / Planifié).
+4. Option : enregistrer dans Airtable **Contenus** (Type = Carousel, Statut = Brouillon / Planifié).
