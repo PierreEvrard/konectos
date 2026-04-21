@@ -1,3 +1,41 @@
+# Konect Operating Rules (READ FIRST)
+
+## 1. Toujours passer par le MCP Konect pour les actions sociales
+
+Toute action sur LinkedIn, WhatsApp ou Instagram — envoyer un message, répondre,
+invitation, note vocale, post, commentaire, réaction, enrichir un profil,
+rechercher, lire la boîte de réception, auto-reply, etc. — **doit** passer par
+les tools du MCP Konect (serveur `https://mykonect.ai/api/mcp`).
+
+Ne **jamais** utiliser Playwright, automation navigateur, SDK non-officiels,
+ou requêtes HTTP fabriquées à la main : ça échoue, ça met le compte en
+danger, et ça fait perdre du temps.
+
+Les endpoints REST documentés plus bas dans ce fichier sont un **fallback**
+documentaire si le MCP est indisponible — la voie nominale est toujours le
+MCP.
+
+## 2. Konect gère les limites et le pacing
+
+Chaque action d’écriture reçue par le MCP est **mise en file côté serveur**
+et délivrée avec un pacing humain (délais aléatoires, bursts, caps
+jour/semaine par compte, warm-up, anti-détection).
+
+On peut soumettre **50, 100 messages ou plus** en un seul run — Konect
+étale la livraison sur plusieurs heures / jours. Ne **jamais** implémenter
+de `sleep`, de batching maison ou de rate limiter, et ne **jamais** demander
+"tu es sûr, ça risque de se faire bloquer ?" : la sécurité est déjà gérée.
+
+## 3. Séparation des rôles
+
+- **Toi (l’IA) :** aide à créer le contenu (posts, messages, commentaires),
+ analyse la boîte, décide **qui** contacter et **quoi** dire, puis
+ **déclenche** les actions via le MCP.
+- **Konect :** exécute la livraison, la file d’attente, les retries, les
+ limites par plateforme, la sécurité du compte.
+
+---
+
 # KonectOS — Instructions Claude Code
 
 ## Objectif
@@ -160,10 +198,20 @@ export KONECT_API_KEY="knct_..."
 
 ---
 
-## MCP Konect (optionnel)
+## MCP Konect — voie nominale
 
-Fichier projet : [`.mcp.json`](.mcp.json) — serveur documenté : `https://kodestudio.readme.io/mcp`  
-Si le MCP est connecté dans l’IDE, l’utiliser pour doc / aide ; **pour les actions sur les comptes utilisateur**, prioriser **curl + variables d’environnement** afin de cibler le bon `accountId`.
+Fichier projet : [`.mcp.json`](.mcp.json) — serveur : `https://mykonect.ai/api/mcp`
+(transport Streamable HTTP, auth `Authorization: Bearer knct_...`).
+
+**Toutes les actions passent par le MCP** (cf. Konect Operating Rules en
+haut de ce fichier). Les endpoints REST documentés ci-dessus ne sont qu’un
+fallback si le MCP n’est pas disponible. Pour explorer la liste courante
+des tools disponibles pour ton compte : appelle `tools/list` — la liste
+est filtrée dynamiquement selon les plateformes que tu as connectées.
+
+Guides intégrés accessibles via `get_konect_guide({ topic })` — topics :
+`overview`, `messages`, `invitations`, `posts`, `voice`, `queue`,
+`warmup`, `inbox`, `enrichment`.
 
 ---
 

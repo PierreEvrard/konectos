@@ -1,7 +1,11 @@
 {
   "mcpServers": {
     "konect": {
-      "url": "https://kodestudio.readme.io/mcp"
+      "type": "http",
+      "url": "https://mykonect.ai/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${KONECT_API_KEY}"
+      }
     }
   }
 }

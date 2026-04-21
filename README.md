@@ -59,9 +59,18 @@ Les **account IDs** sont récupérés automatiquement lors de l'`/onboarding` vi
 
 ---
 
-## MCP Konect (optionnel)
+## MCP Konect — voie nominale
 
-Le fichier [`.mcp.json`](.mcp.json) configure le MCP officiel Konect pour de l'aide contextuelle sur la doc dans ton IDE.
+Le fichier [`.mcp.json`](.mcp.json) configure le MCP natif Konect
+(`https://mykonect.ai/api/mcp`). **Toutes les actions sociales passent par le
+MCP** : messages, invitations, posts, commentaires, enrichissement de profils,
+inbox, etc. Konect gère la file d’attente, les délais humains, les caps par
+plateforme et la sécurité du compte — voir les "Konect Operating Rules" en
+haut de [`CLAUDE.md`](CLAUDE.md).
+
+La clé API (`knct_...`) est lue depuis la variable `KONECT_API_KEY` du fichier
+`.env` (Claude Code / Cursor / VS Code / Antigravity la substituent
+automatiquement au démarrage).
 
 ---
 
