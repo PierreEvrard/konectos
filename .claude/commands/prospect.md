@@ -46,8 +46,19 @@ curl -s -X POST "${KONECT_BASE_URL}/linkedin/search" \
    téléphone selon plateforme). Ne JAMAIS créer deux lignes pour le
    même lead.
 4. **Pousser immédiatement** les nouveaux leads (non-dupes) dans
-   `Contacts` avec `Statut = "New"`, `Plateforme source`, `URL / handle`,
-   `Score ICP` initial (si calculable) et `Dernier contact` vide. Ne pas
-   se contenter d’un export markdown : tant que ce n’est pas dans
-   Airtable, ça n’existe pas pour le système.
+   `Contacts` avec :
+   - `Statut = "New"`
+   - `Plateforme source` (LinkedIn / Instagram / WhatsApp)
+   - `Source` (ex. `LinkedIn Search`, `LinkedIn Sales Navigator`,
+     `LinkedIn Followers`, `Instagram Search`, …)
+   - `ID` → provider ID Konect du lead (indispensable pour les
+     invitations LinkedIn et le ré-appariement des conversations)
+   - `Relation` → degré LinkedIn (`1` / `2` / `3` / `3+`) si
+     disponible dans le résultat de recherche
+   - `Localisation` → ville du lead si fournie par la recherche
+   - `LinkedIn URL` / `Instagram` / `WhatsApp` selon le canal
+   - `Score ICP` initial (si calculable), `Dernier contact` vide.
+
+   Ne pas se contenter d'un export markdown : tant que ce n'est pas
+   dans Airtable, ça n'existe pas pour le système.
 5. Prochaine étape : `/enrich` (profils manquants) puis `/icebreaker`.

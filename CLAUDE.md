@@ -45,7 +45,11 @@ suivre cette boucle — sans exception :
    l’enregistrement existant au lieu d’en créer un nouveau.
 2. À chaque **scrape / recherche** (LinkedIn search, followers, Instagram
    explore, etc.), pousser immédiatement les résultats dans le CRM avec
-   statut « New » — dédoublonner d’abord. Ne **jamais** laisser des leads
+   statut « New » — dédoublonner d’abord. Remplir systématiquement :
+   `ID` (provider ID Konect du lead), `Localisation` (ville), `Relation`
+   (degré LinkedIn : `1` / `2` / `3` / `3+` si dispo) et `Source`
+   (`LinkedIn Search`, `LinkedIn Sales Navigator`, `LinkedIn Followers`,
+   `Instagram Search`, `Inbound`, …). Ne **jamais** laisser des leads
    flotter uniquement dans la mémoire du chat.
 3. Après chaque **envoi** (message, invite, note vocale, réponse), mettre à
    jour la ligne CRM : `Statut` (`Contacté` / `Répondu` / `RDV` / `Gagné` /
@@ -243,7 +247,7 @@ Guides intégrés accessibles via `get_konect_guide({ topic })` — topics :
 
 ### Tables Airtable (2 — créées / documentées par `/onboarding`)
 
-1. **Contacts** — Nom, URLs / handles, plateforme source, statut, score ICP, notes, dernier contact ; champs optionnels pour Konect : `chatId Konect`, `Plateforme chat`, aperçu / unread si besoin (à la place d’une table Conversations dédiée).  
+1. **Contacts** — `Nom`, `Entreprise`, `Titre`, `Localisation` (ville), `ID` (provider ID Konect du lead), `LinkedIn URL`, `Instagram`, `WhatsApp`, `Plateforme source` (LinkedIn / WhatsApp / Instagram), `Source` (LinkedIn Search / Sales Navigator / Relations / Followers / Post Engagement / Instagram Search / Instagram Followers / WhatsApp Import / Inbound / Manuel), `Relation` (degré LinkedIn : 1 / 2 / 3 / 3+), `Statut` (New / Contacté / Répondu / RDV / Gagné / Perdu / Ne pas contacter), `Score ICP`, `Notes`, `Dernier contact`, `Dernier message`, `Icebreaker`, `chatId Konect`, `Plateforme chat` (linkedin / whatsapp / instagram), `Unread`.  
 2. **Contenus** — Titre, plateforme, type, statut, texte, date publication, `scheduledAt`
 
 Respecter les options **singleSelect** existantes (valeurs exactes).

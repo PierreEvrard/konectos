@@ -11,7 +11,11 @@ dédupe CRM préalable et sans mise à jour CRM après coup.
 ## Boucle CRM-sync (rappel)
 
 1. **Scrape / recherche** (`/prospect`, `list_followers`, etc.) → dédupe
-   contre `Contacts` → insérer les nouveaux en `Statut = "New"`.
+   contre `Contacts` → insérer les nouveaux en `Statut = "New"`, en
+   remplissant **toujours** : `ID` (provider ID Konect du lead),
+   `Localisation` (ville), `Relation` (degré LinkedIn 1 / 2 / 3 / 3+
+   si dispo), `Source` (ex. `LinkedIn Search`, `LinkedIn Sales
+   Navigator`, `LinkedIn Followers`, `Instagram Search`, …).
 2. **Avant envoi** (`/icebreaker`, `/invite`, `/followup`) → s’assurer
    que la cible est dans `Contacts`. Si non : créer la ligne d’abord.
 3. **Après envoi** → mettre à jour `Statut` (`Contacté` / `Répondu` / …),
@@ -51,7 +55,7 @@ curl -s -X PATCH "https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${TABLE_ID}" \
 
 ## Workflow
 
-1. Comprendre la demande (table **Contacts** ou **Contenus** : liste, recherche, MAJ statut, champs optionnels type `chatId Konect` sur un contact).
+1. Comprendre la demande (table **Contacts** ou **Contenus** : liste, recherche, MAJ statut, champs optionnels type `chatId Konect`, `ID`, `Localisation`, `Relation`, `Source` sur un contact).
 2. Construire la requête ; paginer avec `offset`.
 3. Présenter les résultats de façon lisible.
 4. Pour écritures : confirmer les **valeurs exactes** des singleSelect.
