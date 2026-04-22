@@ -61,6 +61,37 @@ suivre cette boucle — sans exception :
    **STOP** : prévenir l’utilisateur et demander la connexion avant toute
    action sortante. Sans CRM, on pilote à l’aveugle.
 
+## 5. La liste des tools MCP est figée en début de session
+
+Le MCP Konect **filtre** les tools exposés en fonction des comptes
+connectés au moment où le client MCP (Claude Code / Cursor / VS Code /
+Claude Cowork) appelle `tools/list`. Cette liste est ensuite **mise en
+cache pour toute la session**.
+
+Si un compte LinkedIn / WhatsApp / Instagram a été connecté ou
+reconnecté **après** le démarrage de la session, les nouveaux tools
+(`search_linkedin`, `send_invite`, `enrich_profiles_batch`,
+`list_relations`, `list_followers`, `list_post_comments`, …) ne seront
+**pas** visibles dans la session courante — même si `list_accounts`
+remonte bien le compte en `connected`.
+
+**Procédure quand un tool attendu semble absent :**
+
+1. Appeler `list_accounts` pour vérifier le statut du compte :
+   - `connected` + tool toujours absent → la liste est simplement
+     en cache : prévenir l’utilisateur et lui demander de **rouvrir
+     une nouvelle fenêtre / redémarrer une nouvelle session** dans
+     le client MCP, puis réessayer.
+   - `disconnected` / `reconnecting` / `error` → prévenir l’utilisateur
+     du compte concerné et lui demander de le reconnecter sur
+     `mykonect.ai/dashboard/accounts`. Ne **jamais** essayer de
+     contourner en manuel.
+2. **Ne jamais figer** `account_identifier`, `accountId` ou
+   `account_name` dans ce fichier, `memory/operational/config.md`
+   ou les commandes — ils peuvent tourner à chaque reconnexion.
+   Toujours les résoudre **en live** via `list_accounts` au début
+   de chaque session.
+
 ---
 
 # KonectOS — Instructions Claude Code
