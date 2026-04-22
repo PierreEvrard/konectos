@@ -3,7 +3,24 @@ description: Consulter et mettre à jour le CRM Airtable (tables Contacts et Con
 ---
 # CRM — Airtable
 
-Opérations **lecture / filtre / mise à jour** sur la base Airtable **KonectOS**.
+Opérations **lecture / filtre / mise à jour** sur la base Airtable
+**KonectOS**. Le CRM est la **source unique de vérité** pour chaque lead
+(cf. Operating Rule 4 dans `CLAUDE.md`) : aucune action sortante sans
+dédupe CRM préalable et sans mise à jour CRM après coup.
+
+## Boucle CRM-sync (rappel)
+
+1. **Scrape / recherche** (`/prospect`, `list_followers`, etc.) → dédupe
+   contre `Contacts` → insérer les nouveaux en `Statut = "New"`.
+2. **Avant envoi** (`/icebreaker`, `/invite`, `/followup`) → s’assurer
+   que la cible est dans `Contacts`. Si non : créer la ligne d’abord.
+3. **Après envoi** → mettre à jour `Statut` (`Contacté` / `Répondu` / …),
+   `Dernier contact` (ISO), `Dernier message` (copie tronquée),
+   `Icebreaker` (si 1er contact), `chatId Konect`, `Plateforme chat`.
+4. **Lecture inbox** (`/linkedin-agent`, `/whatsapp-agent`,
+   `/instagram-agent`) → pour chaque message inbound, retrouver la
+   ligne `Contacts` (par `chatId Konect` ou URL) et passer à
+   `Statut = "Répondu"`, ajouter un extrait aux `Notes`.
 
 ## Quand activer
 

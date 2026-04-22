@@ -37,10 +37,17 @@ curl -s -X POST "${KONECT_BASE_URL}/linkedin/search" \
 `category` : `people` | `companies` | `jobs` | `posts`  
 `filters.network` : `1`, `2`, `3` (distance réseau, si supporté par le compte)
 
-## Workflow
+## Workflow (CRM-sync obligatoire)
 
 1. Construire `query` + filtres à partir de l’ICP.
-2. Exécuter la recherche ; normaliser les résultats (nom, headline, URL, identifiant public si présent).
-3. Dédupliquer vs Airtable **Contacts** si base configurée.
-4. Proposer import (batch max raisonnable) ou export markdown dans `generated/`.
-5. Prochaine étape : `/enrich` ou `/icebreaker`.
+2. Exécuter la recherche ; normaliser les résultats (nom, headline, URL,
+   identifiant public si présent).
+3. **Dédupliquer contre Airtable `Contacts`** (URL de profil, handle,
+   téléphone selon plateforme). Ne JAMAIS créer deux lignes pour le
+   même lead.
+4. **Pousser immédiatement** les nouveaux leads (non-dupes) dans
+   `Contacts` avec `Statut = "New"`, `Plateforme source`, `URL / handle`,
+   `Score ICP` initial (si calculable) et `Dernier contact` vide. Ne pas
+   se contenter d’un export markdown : tant que ce n’est pas dans
+   Airtable, ça n’existe pas pour le système.
+5. Prochaine étape : `/enrich` (profils manquants) puis `/icebreaker`.

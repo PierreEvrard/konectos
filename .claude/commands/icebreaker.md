@@ -99,6 +99,21 @@ Si `failed` : lire `error` (fenêtre d'envoi, compte déconnecté, contenu refus
 
 ---
 
-## Étape 6 — CRM
+## Étape 6 — CRM (obligatoire — pas optionnel)
 
-MAJ **Contacts** Airtable : `Statut` → « Contacté », `Dernier contact`, champ optionnel `chatId Konect` quand disponible.
+**Avant** l’envoi (Étape 4), vérifier que chaque cible existe bien dans
+Airtable `Contacts`. Si absente → créer la ligne (`Statut = "New"`) avant
+d’envoyer. Dédupliquer par URL / handle.
+
+**Après** chaque envoi (chaque `queueId` renvoyé par Konect), mettre à
+jour la ligne correspondante :
+- `Statut` → « Contacté »
+- `Dernier contact` → horodatage d’envoi (ISO)
+- `Dernier message` → copie tronquée du message envoyé
+- `Icebreaker` → texte complet si 1er contact
+- `chatId Konect` → dès que disponible (après livraison)
+- `Plateforme chat` → `linkedin` / `whatsapp` / `instagram`
+
+Ne **jamais** envoyer sans avoir préparé la mise à jour CRM : c’est ce
+qui permet à `/followup`, `/linkedin-agent` et `/report` de travailler
+ensuite sur des données fiables.

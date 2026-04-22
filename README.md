@@ -74,12 +74,12 @@ automatiquement au démarrage).
 
 ---
 
-## Commandes (26)
+## Commandes (25)
 
 | Catégorie | Commandes |
 |-----------|-------------|
 | **Système** | `/onboarding`, `/brain-status`, `/memory-save` |
-| **Stratégie** | `/icp`, `/positioning`, `/sequence` |
+| **Stratégie** | `/icp`, `/positioning` |
 | **LinkedIn** | `/prospect`, `/enrich`, `/score`, `/invite` |
 | **CRM & messages** | `/crm`, `/icebreaker`, `/followup`, `/linkedin-agent`, `/whatsapp-agent` |
 | **Instagram** | `/instagram-prospect`, `/instagram-agent` |

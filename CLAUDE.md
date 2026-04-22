@@ -34,6 +34,29 @@ de `sleep`, de batching maison ou de rate limiter, et ne **jamais** demander
 - **Konect :** exécute la livraison, la file d’attente, les retries, les
  limites par plateforme, la sécurité du compte.
 
+## 4. Garder le CRM synchronisé en permanence (boucle obligatoire)
+
+Le CRM (Airtable par défaut, Notion / HubSpot / etc. sinon) est la **source
+unique de vérité** pour chaque lead touché. À chaque interaction sortante,
+suivre cette boucle — sans exception :
+
+1. **Avant** de contacter quelqu’un, chercher dans le CRM (URL de profil,
+   téléphone, username) et **dédoublonner**. Si déjà présent, réutiliser
+   l’enregistrement existant au lieu d’en créer un nouveau.
+2. À chaque **scrape / recherche** (LinkedIn search, followers, Instagram
+   explore, etc.), pousser immédiatement les résultats dans le CRM avec
+   statut « New » — dédoublonner d’abord. Ne **jamais** laisser des leads
+   flotter uniquement dans la mémoire du chat.
+3. Après chaque **envoi** (message, invite, note vocale, réponse), mettre à
+   jour la ligne CRM : `Statut` (`Contacté` / `Répondu` / `RDV` / `Gagné` /
+   `Perdu`), `Dernier contact` (maintenant, ISO), `Dernier message` (copie
+   tronquée), `Icebreaker` (si 1er contact), + note si utile.
+4. À la lecture de l’**inbox**, réconcilier les réponses : message inbound
+   → statut ligne = « Répondu » + extrait ajouté aux Notes.
+5. Si aucun MCP CRM (Airtable / Notion / HubSpot / …) n’est connecté,
+   **STOP** : prévenir l’utilisateur et demander la connexion avant toute
+   action sortante. Sans CRM, on pilote à l’aveugle.
+
 ---
 
 # KonectOS — Instructions Claude Code
@@ -57,7 +80,6 @@ Quand l’utilisateur décrit un besoin en français, **détecter l’intention*
 | sauvegarder en mémoire, retenir cette leçon | `/memory-save` |
 | ICP, cible idéale, persona | `/icp` |
 | positionnement, messaging, proposition de valeur | `/positioning` |
-| séquence, multi-touch, LI puis WhatsApp | `/sequence` |
 | trouver des leads, recherche LinkedIn | `/prospect` |
 | enrichir un profil, compléter les infos | `/enrich` |
 | scorer, prioriser des leads | `/score` |
@@ -107,7 +129,6 @@ Si l’intention est floue : **une seule** question courte de clarification.
 | `memory/operational/config.md` | Base URL (via `.env`), clé, account IDs, table IDs Airtable |
 | `memory/operational/agent-prompts.md` | System prompts + premiers messages par plateforme (`{{variables}}`) |
 | `memory/operational/templates.md` | Icebreakers et relances validés |
-| `memory/operational/sequences.md` | Séquences cross-canal |
 | `memory/identity/persona.md` | Profil utilisateur + ICP |
 | `memory/identity/brand.md` | Ton, marque |
 | `memory/identity/offer.md` | Offre, CTA, règles prix |
@@ -224,8 +245,6 @@ Guides intégrés accessibles via `get_konect_guide({ topic })` — topics :
 
 1. **Contacts** — Nom, URLs / handles, plateforme source, statut, score ICP, notes, dernier contact ; champs optionnels pour Konect : `chatId Konect`, `Plateforme chat`, aperçu / unread si besoin (à la place d’une table Conversations dédiée).  
 2. **Contenus** — Titre, plateforme, type, statut, texte, date publication, `scheduledAt`
-
-Les **séquences** multi-touch restent décrites dans `memory/operational/sequences.md` (mémoire markdown), pas dans une table Airtable.
 
 Respecter les options **singleSelect** existantes (valeurs exactes).
 
