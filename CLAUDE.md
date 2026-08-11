@@ -250,7 +250,7 @@ export KONECT_API_KEY="knct_..."
 | DELETE | `/queue/{id}` | Annuler une action — **uniquement** si statut `queued` |
 | GET | `/usage` | `since`, `until` (défaut ~30 jours) — volumes par plateforme / type |
 
-**Types d’actions** (champ typique) : `message`, `chat_reply`, `post`, `comment`, `reaction`, `invite`, `invite_with_note`
+**Types d’actions** (champ typique) : `message`, `chat_reply`, `voice_message`, `voice_reply`, `post`, `comment`, `reaction`, `invite`, `profile`
 
 ---
 
