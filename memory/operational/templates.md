@@ -11,7 +11,7 @@ Espace pour les **icebreakers**, **premiers messages**, **relances** validés pa
 - Valider avec l'utilisateur avant envoi en masse (> 5 messages)
 - Premier message LinkedIn / Instagram : `POST /messages` avec `to` (identifiant profil ou URL)
 - Réponse dans un fil existant : `chatId` + `content` (ne jamais inverser)
-- Notes invitation LinkedIn : max 300 caractères (`POST /relations/invite` → champ `message`)
+- Premier message après acceptation d'invitation LinkedIn (pas de note à l'invitation elle-même)
 - Ne jamais envoyer de lien dans le tout premier message LinkedIn sauf politique contraire dans `offer.md`
 
 ---
@@ -120,14 +120,20 @@ tu es encore intéressé par [thème] ?
 
 ---
 
-## Notes d'invitation LinkedIn (few-shots, max 300 caractères)
+## Premier message après acceptation d'invitation (LinkedIn)
+
+> Konect n'envoie **pas** de note avec l'invitation : LinkedIn la plafonne à
+> 1-2/jour sur un compte basique, contre ~21 invitations nues, pour un taux
+> d'acceptation équivalent. Le message part donc **une fois l'invitation
+> acceptée** — il passe alors sur le quota messages, bien plus large, et il
+> est lu dans un contexte où la personne a déjà dit oui.
 
 ```
-Salut {prospect_name}, j'ai vu [contexte bref] — j'aimerais qu'on soit connectés pour échanger.
+Merci d'avoir accepté {prospect_name}. J'ai vu [contexte précis vu sur son profil ou son post] — c'est exactement ce qu'on croise chez [type de client]. Ça se passe comment de ton côté ?
 ```
 
 ```
-{prospect_name}, ton profil m'a semblé pertinent sur [thème]. Heureux de connecter.
+{prospect_name}, content d'être connecté. Ta prise de position sur [thème] m'a parlé : [angle en une ligne]. Tu creuses ce sujet en ce moment ?
 ```
 
 ---

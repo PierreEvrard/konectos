@@ -22,9 +22,15 @@ KonectOS utilise l'API **[Konect](https://mykonect.ai)** pour piloter LinkedIn, 
 3. Générer une clé API (`knct_...`) depuis le dashboard
 4. Renseigner la clé dans le fichier `.env`
 
-### 3. Airtable (gratuit)
+### 3. Airtable (gratuit) — selon ton usage
 
-Base CRM **KonectOS** avec 2 tables : **Contacts** + **Contenus**. Créée lors de l'`/onboarding`.
+Base CRM **KonectOS** avec 2 tables : **Contacts** + **Contenus**, créée lors de
+l'`/onboarding`.
+
+**Requis pour la prospection et le setting** : lancer une séquence sans trace de
+qui a été contacté, c'est recontacter les mêmes personnes et en oublier
+d'autres. **Optionnel pour le support, le contenu et la veille** — l'onboarding
+te le proposera sans bloquer si tu passes.
 
 ---
 
@@ -59,23 +65,31 @@ Les **account IDs** sont récupérés automatiquement lors de l'`/onboarding` vi
 
 ---
 
-## MCP Konect (optionnel)
+## MCP Konect
 
-Le fichier [`.mcp.json`](.mcp.json) configure le MCP officiel Konect pour de l'aide contextuelle sur la doc dans ton IDE.
+Le fichier [`.mcp.json`](.mcp.json) connecte le serveur MCP Konect
+(`https://mykonect.ai/api/mcp`) avec ta `KONECT_API_KEY`. C'est la voie par
+défaut pour toutes les actions : les tools renvoient le quota restant, des
+erreurs actionnables, et embarquent les guides (`get_konect_guide`).
+
+Le REST v1 reste documenté dans [`CLAUDE.md`](CLAUDE.md) comme repli.
 
 ---
 
-## Commandes (26)
+## Commandes (32)
 
-| Catégorie | Commandes |
+Organisées par ce que tu veux faire, pas par plateforme.
+
+| Cas d'usage | Commandes |
 |-----------|-------------|
-| **Système** | `/onboarding`, `/brain-status`, `/memory-save` |
+| **Support client** | `/inbox-triage`, `/reply-draft`, `/faq` |
+| **Prospection** | `/prospect`, `/enrich`, `/score`, `/invite`, `/icebreaker`, `/followup` |
+| **Setting / RDV** | `/qualify`, `/book`, `/followup-rdv` |
+| **Contenu** | `/post`, `/carousel`, `/instagram-post`, `/content-plan`, `/engage` |
+| **Analyse & veille** | `/dashboard`, `/report`, `/weekly` |
 | **Stratégie** | `/icp`, `/positioning`, `/sequence` |
-| **LinkedIn** | `/prospect`, `/enrich`, `/score`, `/invite` |
-| **CRM & messages** | `/crm`, `/icebreaker`, `/followup`, `/linkedin-agent`, `/whatsapp-agent` |
-| **Instagram** | `/instagram-prospect`, `/instagram-agent` |
-| **Contenus** | `/post`, `/carousel`, `/instagram-post`, `/content-plan`, `/engage` |
-| **Analytics** | `/dashboard`, `/report`, `/weekly`, `/settings` |
+| **Par plateforme** | `/linkedin-agent`, `/whatsapp-agent`, `/instagram-agent`, `/instagram-prospect` |
+| **Système** | `/onboarding`, `/brain-status`, `/memory-save`, `/crm`, `/settings` |
 
 Tape `/commande` **ou** décris ton besoin en langage naturel : l'auto-routing de [`CLAUDE.md`](CLAUDE.md) détecte l'intention automatiquement.
 

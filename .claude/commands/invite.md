@@ -53,20 +53,23 @@ curl -s -X POST "${KONECT_BASE_URL}/relations/invite" \
   -H "Content-Type: application/json" \
   -d '{
     "accountId": "'"${KONECT_ACCOUNT_ID_LINKEDIN}"'",
-    "profileId": "IDENTIFIANT_PROVIDER",
-    "message": "Note courte max 300 caractères (LinkedIn)"
+    "profileId": "IDENTIFIANT_PROVIDER"
   }'
 ```
 
-- `message` : optionnel, **300 caractères max** LinkedIn. Utiliser les templates de `memory/operational/templates.md` section « Notes d'invitation ».
+- **Pas de note d'invitation.** Konect ne l'expose pas : LinkedIn plafonne les
+  invitations avec note à 1-2/jour sur un compte basique, contre ~21 sans note,
+  et pour un taux d'acceptation équivalent. Un `message` envoyé ici est ignoré
+  côté serveur. La bonne séquence : invitation nue, puis `/icebreaker` dès
+  l'acceptation — le message passe alors sur le quota messages, bien plus large.
 - Instagram : follow via le même endpoint (sans `message`).
 
 ---
 
 ## Workflow
 
-1. Vérifier warmup du compte : `GET /accounts` → champ `warmup_level`.
-2. **Préparer la liste** (profileId + note) — si `profileId` manquant sur certaines cibles : utiliser `/enrich` d'abord.
+1. Vérifier la marge du jour : `get_usage` → `limits[].actions.invite`.
+2. **Préparer la liste** (profileId) — si `profileId` manquant sur certaines cibles : utiliser `/enrich` d'abord.
 3. **Validation utilisateur** avant tout envoi > 5 invitations.
 4. Envoyer par vagues ; noter `queueId` pour chaque action.
 5. Suivi queue :

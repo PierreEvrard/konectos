@@ -22,7 +22,7 @@ curl -s "${KONECT_BASE_URL}/accounts" \
   -H "Authorization: Bearer ${KONECT_API_KEY}"
 ```
 
-Tableau : plateforme | status | id | warmup (si dispo).
+Tableau : plateforme | nom du compte | status | id | pays de connexion.
 
 ### 2. File d’attente (queued)
 

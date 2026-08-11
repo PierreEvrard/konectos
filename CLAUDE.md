@@ -4,7 +4,7 @@
 
 KonectOS transforme Claude Code en **assistant d’automatisation sociale** centré sur **Konect** : LinkedIn, WhatsApp et Instagram (messages, posts, commentaires, réactions, invitations, file d’attente, stats).
 
-Chaque utilisateur possède **sa propre clé API Konect** et **son CRM Airtable**. Tout passe par le terminal : commandes `/...` ou langage naturel (auto-routing).
+Chaque utilisateur possède **sa propre clé API Konect**, et **un CRM Airtable si son usage l'exige** (prospection, setting). Tout passe par le terminal : commandes `/...` ou langage naturel (auto-routing).
 
 ---
 
@@ -95,7 +95,7 @@ export KONECT_API_KEY="knct_..."
 | Méthode | Endpoint | Notes |
 |---------|----------|--------|
 | POST | `/accounts/connect` | Body `{"platform":"linkedin"|"whatsapp"|"instagram"}` → URL OAuth |
-| GET | `/accounts` | Liste des comptes (`id`, `platform`, `status`, `warmup_level`, …) |
+| GET | `/accounts` | Liste des comptes (`id`, `platform`, `status`, `account_name`, `avatar_url`, `proxy_country`, …) |
 | GET | `/accounts/{id}` | Détail compte |
 | PATCH | `/accounts/{id}` | Reconnexion |
 | DELETE | `/accounts/{id}` | Déconnexion |
@@ -144,7 +144,7 @@ export KONECT_API_KEY="knct_..."
 
 | Méthode | Endpoint | Body / query |
 |---------|----------|--------------|
-| POST | `/relations/invite` | `accountId`, **`profileId`** (requis), `message` (optionnel, **max 300** caractères LinkedIn) |
+| POST | `/relations/invite` | `accountId`, **`profileId`** (requis). Pas de note : un `message` envoyé ici est ignoré (voir plus bas) |
 | GET | `/relations` | `accountId`, `limit`, `cursor` |
 | GET | `/relations/followers` | `accountId`, `limit`, `cursor` |
 
@@ -156,14 +156,35 @@ export KONECT_API_KEY="knct_..."
 | DELETE | `/queue/{id}` | Annuler une action — **uniquement** si statut `queued` |
 | GET | `/usage` | `since`, `until` (défaut ~30 jours) — volumes par plateforme / type |
 
-**Types d’actions** (champ typique) : `message`, `chat_reply`, `post`, `comment`, `reaction`, `invite`, `invite_with_note`
+**Types d’actions** (champ typique) : `message`, `chat_reply`, `voice_message`, `voice_reply`, `post`, `comment`, `reaction`, `invite`, `profile`
+
+> Konect n’expose **pas** l’invitation avec note : LinkedIn la limite ~10× plus
+> sévèrement (1-2/jour sur un compte basique). La bonne séquence est invitation
+> sans note, puis message dès l’acceptation.
 
 ---
 
-## MCP Konect (optionnel)
+## MCP Konect — la voie par défaut
 
-Fichier projet : [`.mcp.json`](.mcp.json) — serveur documenté : `https://kodestudio.readme.io/mcp`  
-Si le MCP est connecté dans l’IDE, l’utiliser pour doc / aide ; **pour les actions sur les comptes utilisateur**, prioriser **curl + variables d’environnement** afin de cibler le bon `accountId`.
+Fichier projet : [`.mcp.json`](.mcp.json) — serveur : `https://mykonect.ai/api/mcp`,
+authentifié par `KONECT_API_KEY`.
+
+**Utiliser les tools MCP pour toute action sur les comptes.** Chaque tool prend
+un `accountId` explicite (celui de `.env` : `KONECT_ACCOUNT_ID_LINKEDIN`, etc.),
+donc le ciblage du bon compte est aussi précis qu’en curl — c’était la raison
+d’être de l’ancienne consigne « curl d’abord », qui ne s’applique plus.
+
+Ce que le MCP apporte et que curl n’a pas :
+- le **quota restant** renvoyé à chaque appel (`get_usage` donne l’état par
+  heure / jour / semaine), donc on dimensionne un lot avant de le lancer au
+  lieu de se prendre un 429 en cours de route ;
+- des **erreurs actionnables** (« reconnecte ce compte », « envoie une
+  invitation d’abord ») au lieu du JSON brut de la plateforme ;
+- une clé `items` sur toutes les listes, donc un seul parseur ;
+- les **guides intégrés** (`get_konect_guide`), notamment `quotas` et `search`.
+
+Le REST v1 reste documenté ci-dessus et fonctionne : il sert de repli si le MCP
+n’est pas connecté dans l’IDE, ou pour un script hors Claude Code.
 
 ---
 

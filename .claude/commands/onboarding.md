@@ -55,7 +55,7 @@ KONECT_BASE_URL=https://mykonect.ai/api/v1
 2. Tester immédiatement la connexion :
 
 ```bash
-curl -s "https://mykonect.ai/api/v1/accounts" \
+curl -s "${KONECT_BASE_URL}/accounts" \
   -H "Authorization: Bearer LA_CLE_FOURNIE"
 ```
 
@@ -152,7 +152,7 @@ curl -s -X POST "https://api.airtable.com/v0/meta/bases" \
           {"name": "Instagram", "type": "singleLineText"},
           {"name": "WhatsApp", "type": "phoneNumber"},
           {"name": "Plateforme source", "type": "singleSelect", "options": {"choices": [{"name": "LinkedIn"}, {"name": "WhatsApp"}, {"name": "Instagram"}]}},
-          {"name": "Statut", "type": "singleSelect", "options": {"choices": [{"name": "Lead"}, {"name": "Contacté"}, {"name": "En discussion"}, {"name": "Qualifié"}, {"name": "Client"}, {"name": "Ne pas contacter"}]}},
+          {"name": "Statut", "type": "singleSelect", "options": {"choices": [{"name": "Lead"}, {"name": "Contacté"}, {"name": "Répondu"}, {"name": "En discussion"}, {"name": "Qualifié"}, {"name": "RDV"}, {"name": "Client"}, {"name": "Ne pas contacter"}]}},
           {"name": "Score ICP", "type": "number", "options": {"precision": 0}},
           {"name": "Notes", "type": "multilineText"},
           {"name": "Dernier contact", "type": "date", "options": {"dateFormat": {"name": "iso"}}},
