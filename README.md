@@ -22,15 +22,9 @@ KonectOS utilise l'API **[Konect](https://mykonect.ai)** pour piloter LinkedIn, 
 3. Générer une clé API (`knct_...`) depuis le dashboard
 4. Renseigner la clé dans le fichier `.env`
 
-### 3. Airtable (gratuit) — selon ton usage
+### 3. Airtable (gratuit)
 
-Base CRM **KonectOS** avec 2 tables : **Contacts** + **Contenus**, créée lors de
-l'`/onboarding`.
-
-**Requis pour la prospection et le setting** : lancer une séquence sans trace de
-qui a été contacté, c'est recontacter les mêmes personnes et en oublier
-d'autres. **Optionnel pour le support, le contenu et la veille** — l'onboarding
-te le proposera sans bloquer si tu passes.
+Base CRM **KonectOS** avec 2 tables : **Contacts** + **Contenus**. Créée lors de l'`/onboarding`.
 
 ---
 
@@ -65,18 +59,22 @@ Les **account IDs** sont récupérés automatiquement lors de l'`/onboarding` vi
 
 ---
 
-## MCP Konect
+## MCP Konect — voie nominale
 
-Le fichier [`.mcp.json`](.mcp.json) connecte le serveur MCP Konect
-(`https://mykonect.ai/api/mcp`) avec ta `KONECT_API_KEY`. C'est la voie par
-défaut pour toutes les actions : les tools renvoient le quota restant, des
-erreurs actionnables, et embarquent les guides (`get_konect_guide`).
+Le fichier [`.mcp.json`](.mcp.json) configure le MCP natif Konect
+(`https://mykonect.ai/api/mcp`). **Toutes les actions sociales passent par le
+MCP** : messages, invitations, posts, commentaires, enrichissement de profils,
+inbox, etc. Konect gère la file d’attente, les délais humains, les caps par
+plateforme et la sécurité du compte — voir les "Konect Operating Rules" en
+haut de [`CLAUDE.md`](CLAUDE.md).
 
-Le REST v1 reste documenté dans [`CLAUDE.md`](CLAUDE.md) comme repli.
+La clé API (`knct_...`) est lue depuis la variable `KONECT_API_KEY` du fichier
+`.env` (Claude Code / Cursor / VS Code / Antigravity la substituent
+automatiquement au démarrage).
 
 ---
 
-## Commandes (32)
+## Commandes (31)
 
 Organisées par ce que tu veux faire, pas par plateforme.
 
@@ -87,7 +85,7 @@ Organisées par ce que tu veux faire, pas par plateforme.
 | **Setting / RDV** | `/qualify`, `/book`, `/followup-rdv` |
 | **Contenu** | `/post`, `/carousel`, `/instagram-post`, `/content-plan`, `/engage` |
 | **Analyse & veille** | `/dashboard`, `/report`, `/weekly` |
-| **Stratégie** | `/icp`, `/positioning`, `/sequence` |
+| **Stratégie** | `/icp`, `/positioning` |
 | **Par plateforme** | `/linkedin-agent`, `/whatsapp-agent`, `/instagram-agent`, `/instagram-prospect` |
 | **Système** | `/onboarding`, `/brain-status`, `/memory-save`, `/crm`, `/settings` |
 

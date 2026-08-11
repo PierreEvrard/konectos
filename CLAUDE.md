@@ -1,10 +1,106 @@
+# Konect Operating Rules (READ FIRST)
+
+## 1. Toujours passer par le MCP Konect pour les actions sociales
+
+Toute action sur LinkedIn, WhatsApp ou Instagram — envoyer un message, répondre,
+invitation, note vocale, post, commentaire, réaction, enrichir un profil,
+rechercher, lire la boîte de réception, auto-reply, etc. — **doit** passer par
+les tools du MCP Konect (serveur `https://mykonect.ai/api/mcp`).
+
+Ne **jamais** utiliser Playwright, automation navigateur, SDK non-officiels,
+ou requêtes HTTP fabriquées à la main : ça échoue, ça met le compte en
+danger, et ça fait perdre du temps.
+
+Les endpoints REST documentés plus bas dans ce fichier sont un **fallback**
+documentaire si le MCP est indisponible — la voie nominale est toujours le
+MCP.
+
+## 2. Konect gère les limites et le pacing
+
+Chaque action d’écriture reçue par le MCP est **mise en file côté serveur**
+et délivrée avec un pacing humain (délais aléatoires, bursts, caps
+jour/semaine par compte, warm-up, anti-détection).
+
+On peut soumettre **50, 100 messages ou plus** en un seul run — Konect
+étale la livraison sur plusieurs heures / jours. Ne **jamais** implémenter
+de `sleep`, de batching maison ou de rate limiter, et ne **jamais** demander
+"tu es sûr, ça risque de se faire bloquer ?" : la sécurité est déjà gérée.
+
+## 3. Séparation des rôles
+
+- **Toi (l’IA) :** aide à créer le contenu (posts, messages, commentaires),
+ analyse la boîte, décide **qui** contacter et **quoi** dire, puis
+ **déclenche** les actions via le MCP.
+- **Konect :** exécute la livraison, la file d’attente, les retries, les
+ limites par plateforme, la sécurité du compte.
+
+## 4. Garder le CRM synchronisé en permanence (boucle obligatoire)
+
+Le CRM (Airtable par défaut, Notion / HubSpot / etc. sinon) est la **source
+unique de vérité** pour chaque lead touché. À chaque interaction sortante,
+suivre cette boucle — sans exception :
+
+1. **Avant** de contacter quelqu’un, chercher dans le CRM (URL de profil,
+   téléphone, username) et **dédoublonner**. Si déjà présent, réutiliser
+   l’enregistrement existant au lieu d’en créer un nouveau.
+2. À chaque **scrape / recherche** (LinkedIn search, followers, Instagram
+   explore, etc.), pousser immédiatement les résultats dans le CRM avec
+   statut « New » — dédoublonner d’abord. Remplir systématiquement :
+   `ID` (provider ID Konect du lead), `Localisation` (ville), `Relation`
+   (degré LinkedIn : `1` / `2` / `3` / `3+` si dispo) et `Source`
+   (`LinkedIn Search`, `LinkedIn Sales Navigator`, `LinkedIn Followers`,
+   `Instagram Search`, `Inbound`, …). Ne **jamais** laisser des leads
+   flotter uniquement dans la mémoire du chat.
+3. Après chaque **envoi** (message, invite, note vocale, réponse), mettre à
+   jour la ligne CRM : `Statut` (`Contacté` / `Répondu` / `RDV` / `Gagné` /
+   `Perdu`), `Dernier contact` (maintenant, ISO), `Dernier message` (copie
+   tronquée), `Icebreaker` (si 1er contact), + note si utile.
+4. À la lecture de l’**inbox**, réconcilier les réponses : message inbound
+   → statut ligne = « Répondu » + extrait ajouté aux Notes.
+5. Si aucun MCP CRM (Airtable / Notion / HubSpot / …) n’est connecté,
+   **STOP** : prévenir l’utilisateur et demander la connexion avant toute
+   action sortante. Sans CRM, on pilote à l’aveugle.
+
+## 5. La liste des tools MCP est figée en début de session
+
+Le MCP Konect **filtre** les tools exposés en fonction des comptes
+connectés au moment où le client MCP (Claude Code / Cursor / VS Code /
+Claude Cowork) appelle `tools/list`. Cette liste est ensuite **mise en
+cache pour toute la session**.
+
+Si un compte LinkedIn / WhatsApp / Instagram a été connecté ou
+reconnecté **après** le démarrage de la session, les nouveaux tools
+(`search_linkedin`, `send_invite`, `enrich_profiles_batch`,
+`list_relations`, `list_followers`, `list_post_comments`, …) ne seront
+**pas** visibles dans la session courante — même si `list_accounts`
+remonte bien le compte en `connected`.
+
+**Procédure quand un tool attendu semble absent :**
+
+1. Appeler `list_accounts` pour vérifier le statut du compte :
+   - `connected` + tool toujours absent → la liste est simplement
+     en cache : prévenir l’utilisateur et lui demander de **rouvrir
+     une nouvelle fenêtre / redémarrer une nouvelle session** dans
+     le client MCP, puis réessayer.
+   - `disconnected` / `reconnecting` / `error` → prévenir l’utilisateur
+     du compte concerné et lui demander de le reconnecter sur
+     `mykonect.ai/dashboard/accounts`. Ne **jamais** essayer de
+     contourner en manuel.
+2. **Ne jamais figer** `account_identifier`, `accountId` ou
+   `account_name` dans ce fichier, `memory/operational/config.md`
+   ou les commandes — ils peuvent tourner à chaque reconnexion.
+   Toujours les résoudre **en live** via `list_accounts` au début
+   de chaque session.
+
+---
+
 # KonectOS — Instructions Claude Code
 
 ## Objectif
 
 KonectOS transforme Claude Code en **assistant d’automatisation sociale** centré sur **Konect** : LinkedIn, WhatsApp et Instagram (messages, posts, commentaires, réactions, invitations, file d’attente, stats).
 
-Chaque utilisateur possède **sa propre clé API Konect**, et **un CRM Airtable si son usage l'exige** (prospection, setting). Tout passe par le terminal : commandes `/...` ou langage naturel (auto-routing).
+Chaque utilisateur possède **sa propre clé API Konect** et **son CRM Airtable**. Tout passe par le terminal : commandes `/...` ou langage naturel (auto-routing).
 
 ---
 
@@ -19,7 +115,6 @@ Quand l’utilisateur décrit un besoin en français, **détecter l’intention*
 | sauvegarder en mémoire, retenir cette leçon | `/memory-save` |
 | ICP, cible idéale, persona | `/icp` |
 | positionnement, messaging, proposition de valeur | `/positioning` |
-| séquence, multi-touch, LI puis WhatsApp | `/sequence` |
 | trouver des leads, recherche LinkedIn | `/prospect` |
 | enrichir un profil, compléter les infos | `/enrich` |
 | scorer, prioriser des leads | `/score` |
@@ -69,7 +164,6 @@ Si l’intention est floue : **une seule** question courte de clarification.
 | `memory/operational/config.md` | Base URL (via `.env`), clé, account IDs, table IDs Airtable |
 | `memory/operational/agent-prompts.md` | System prompts + premiers messages par plateforme (`{{variables}}`) |
 | `memory/operational/templates.md` | Icebreakers et relances validés |
-| `memory/operational/sequences.md` | Séquences cross-canal |
 | `memory/identity/persona.md` | Profil utilisateur + ICP |
 | `memory/identity/brand.md` | Ton, marque |
 | `memory/identity/offer.md` | Offre, CTA, règles prix |
@@ -144,7 +238,7 @@ export KONECT_API_KEY="knct_..."
 
 | Méthode | Endpoint | Body / query |
 |---------|----------|--------------|
-| POST | `/relations/invite` | `accountId`, **`profileId`** (requis). Pas de note : un `message` envoyé ici est ignoré (voir plus bas) |
+| POST | `/relations/invite` | `accountId`, **`profileId`** (requis). Pas de note : un `message` envoyé ici est ignoré côté serveur |
 | GET | `/relations` | `accountId`, `limit`, `cursor` |
 | GET | `/relations/followers` | `accountId`, `limit`, `cursor` |
 
@@ -156,35 +250,28 @@ export KONECT_API_KEY="knct_..."
 | DELETE | `/queue/{id}` | Annuler une action — **uniquement** si statut `queued` |
 | GET | `/usage` | `since`, `until` (défaut ~30 jours) — volumes par plateforme / type |
 
-**Types d’actions** (champ typique) : `message`, `chat_reply`, `voice_message`, `voice_reply`, `post`, `comment`, `reaction`, `invite`, `profile`
-
-> Konect n’expose **pas** l’invitation avec note : LinkedIn la limite ~10× plus
-> sévèrement (1-2/jour sur un compte basique). La bonne séquence est invitation
-> sans note, puis message dès l’acceptation.
+**Types d’actions** (champ typique) : `message`, `chat_reply`, `post`, `comment`, `reaction`, `invite`, `invite_with_note`
 
 ---
 
-## MCP Konect — la voie par défaut
+## MCP Konect — voie nominale
 
-Fichier projet : [`.mcp.json`](.mcp.json) — serveur : `https://mykonect.ai/api/mcp`,
-authentifié par `KONECT_API_KEY`.
+Fichier projet : [`.mcp.json`](.mcp.json) — serveur : `https://mykonect.ai/api/mcp`
+(transport Streamable HTTP, auth `Authorization: Bearer knct_...`).
 
-**Utiliser les tools MCP pour toute action sur les comptes.** Chaque tool prend
-un `accountId` explicite (celui de `.env` : `KONECT_ACCOUNT_ID_LINKEDIN`, etc.),
-donc le ciblage du bon compte est aussi précis qu’en curl — c’était la raison
-d’être de l’ancienne consigne « curl d’abord », qui ne s’applique plus.
+**Toutes les actions passent par le MCP** (cf. Konect Operating Rules en
+haut de ce fichier). Les endpoints REST documentés ci-dessus ne sont qu’un
+fallback si le MCP n’est pas disponible. Pour explorer la liste courante
+des tools disponibles pour ton compte : appelle `tools/list` — la liste
+est filtrée dynamiquement selon les plateformes que tu as connectées.
 
-Ce que le MCP apporte et que curl n’a pas :
-- le **quota restant** renvoyé à chaque appel (`get_usage` donne l’état par
-  heure / jour / semaine), donc on dimensionne un lot avant de le lancer au
-  lieu de se prendre un 429 en cours de route ;
-- des **erreurs actionnables** (« reconnecte ce compte », « envoie une
-  invitation d’abord ») au lieu du JSON brut de la plateforme ;
-- une clé `items` sur toutes les listes, donc un seul parseur ;
-- les **guides intégrés** (`get_konect_guide`), notamment `quotas` et `search`.
+Guides intégrés accessibles via `get_konect_guide({ topic })` — topics :
+`overview`, `messages`, `invitations`, `posts`, `search`, `engagement`,
+`voice`, `queue`, `quotas`, `inbox`, `enrichment`.
 
-Le REST v1 reste documenté ci-dessus et fonctionne : il sert de repli si le MCP
-n’est pas connecté dans l’IDE, ou pour un script hors Claude Code.
+> `quotas` et `search` sont les deux à lire avant un gros volume : le premier
+> explique ce que compte une unité, le second pourquoi une recherche peut
+> renvoyer zéro résultat sans erreur.
 
 ---
 
@@ -195,10 +282,8 @@ n’est pas connecté dans l’IDE, ou pour un script hors Claude Code.
 
 ### Tables Airtable (2 — créées / documentées par `/onboarding`)
 
-1. **Contacts** — Nom, URLs / handles, plateforme source, statut, score ICP, notes, dernier contact ; champs optionnels pour Konect : `chatId Konect`, `Plateforme chat`, aperçu / unread si besoin (à la place d’une table Conversations dédiée).  
+1. **Contacts** — `Nom`, `Entreprise`, `Titre`, `Localisation` (ville), `ID` (provider ID Konect du lead), `LinkedIn URL`, `Instagram`, `WhatsApp`, `Plateforme source` (LinkedIn / WhatsApp / Instagram), `Source` (LinkedIn Search / Sales Navigator / Relations / Followers / Post Engagement / Instagram Search / Instagram Followers / WhatsApp Import / Inbound / Manuel), `Relation` (degré LinkedIn : 1 / 2 / 3 / 3+), `Statut` (New / Contacté / Répondu / RDV / Gagné / Perdu / Ne pas contacter), `Score ICP`, `Notes`, `Dernier contact`, `Dernier message`, `Icebreaker`, `chatId Konect`, `Plateforme chat` (linkedin / whatsapp / instagram), `Unread`.  
 2. **Contenus** — Titre, plateforme, type, statut, texte, date publication, `scheduledAt`
-
-Les **séquences** multi-touch restent décrites dans `memory/operational/sequences.md` (mémoire markdown), pas dans une table Airtable.
 
 Respecter les options **singleSelect** existantes (valeurs exactes).
 

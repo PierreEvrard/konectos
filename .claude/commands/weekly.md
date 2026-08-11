@@ -32,7 +32,7 @@ Ajouter une entrée datée dans `memory/synthesis/weekly-synthesis.md` :
 
 ### 4. Priorités S+1
 
-Lister **3 tâches** max (ex. « finaliser séquence WA », « 10 icebreakers IG », « ajuster fenêtre d’envoi »).
+Lister **3 tâches** max (ex. « 10 icebreakers IG », « ajuster fenêtre d’envoi », « relancer les contactés J+5 »).
 
 ### 5. Suite
 
