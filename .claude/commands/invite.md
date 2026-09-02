@@ -89,3 +89,15 @@ curl -s -X DELETE "${KONECT_BASE_URL}/queue/${QUEUE_ID}" \
 ```
 
 7. MAJ **Contacts** Airtable : `Statut` → « Invité », `Dernier contact`.
+
+## Suivi des acceptations (méthode native)
+
+Le tool MCP `list_sent_invites` liste les invitations ENCORE EN ATTENTE de ce
+compte (1 unité `scrape_comments` par page). C'est la méthode de référence,
+pas la vérification du degré de relation profil par profil (1 unité `profile`
+chacun, dix fois plus cher).
+
+Détection d'une acceptation : comparer deux appels espacés. Une invitation qui
+a quitté la liste a été acceptée, refusée ou retirée — la liste ne distingue
+pas ces trois cas, donc confirmer par le degré de relation UNIQUEMENT pour les
+profils sortis de la liste, avant de déclencher `/icebreaker`.
